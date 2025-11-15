@@ -1,11 +1,11 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Countries } from "@/schemas"
-import { Moon, Search } from "lucide-react"
+import { Search } from "lucide-react"
+import Link from "next/link"
 import { useMemo, useState } from "react"
 
 export default function CountriesClient({ countries }: { countries: Countries }) {
@@ -74,25 +74,27 @@ export default function CountriesClient({ countries }: { countries: Countries })
         {/* <div className="flex flex-col items-center md:justify-between md:flex-row md:flex-wrap gap-10"> */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 place-items-center">
           {
-            filtered.map((country, index) => (
-              <Card className={`justify-between border-none rounded-none py-8 pt-0 w-[260] h-[340]`} key={country.cca3}>
-                <img
-                  src={country.flags.svg}
-                  alt={country.flags.alt || `The flag from ${country.name.common}`}
-                  className="max-h-[180px] h-auto w-auto object-contain"
-                />
-                <CardContent className="space-y-5">
-                  <CardTitle>
-                    {country.name.common}
-                  </CardTitle>
+            filtered.map((country) => (
+              <Link href={`/country/${country.cca3}`} key={country.cca3}>
+                <Card className={`justify-between border-none rounded-none py-8 pt-0 w-[260] h-[340]`}>
+                  <img
+                    src={country.flags.svg}
+                    alt={country.flags.alt || `The flag from ${country.name.common}`}
+                    className="max-h-[180px] h-auto w-auto object-contain"
+                  />
+                  <CardContent className="space-y-5">
+                    <CardTitle>
+                      {country.name.common}
+                    </CardTitle>
 
-                  <CardDescription>
-                    <p><span className="font-bold">Population: </span>{country.population}</p>
-                    <p><span className="font-bold">Region: </span>{country.region}</p>
-                    <p><span className="font-bold">Capital: </span>{country.capital}</p>
-                  </CardDescription>
-                </CardContent>
-              </Card>
+                    <CardDescription>
+                      <p><span className="font-bold">Population: </span>{country.population}</p>
+                      <p><span className="font-bold">Region: </span>{country.region}</p>
+                      <p><span className="font-bold">Capital: </span>{country.capital}</p>
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </Link>
             ))
           }
         </div>
