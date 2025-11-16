@@ -110,6 +110,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                     <Link
                       href={`/country/${border}`}
                       key={border}
+                      prefetch={false}
                       className="bg-card px-5 py-1 shadow-xl/20"
                     >
                       {borderMap[border] ?? border}
