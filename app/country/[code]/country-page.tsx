@@ -13,8 +13,7 @@ export const getCountryDetails = async (code: string) => {
 
   // 2) Petición principal
   const response = await fetch(
-    `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`,
-    { cache: "force-cache" }
+    `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`
   )
 
   if (!response.ok) notFound()
@@ -35,8 +34,7 @@ export const getCountryDetails = async (code: string) => {
   const codes = borders.join(",")
 
   const bordersRes = await fetch(
-    `https://restcountries.com/v3.1/alpha?codes=${codes}&fields=name,cca3`,
-    { cache: "force-cache" }
+    `https://restcountries.com/v3.1/alpha?codes=${codes}&fields=name,cca3`
   )
 
   if (!bordersRes.ok) notFound()
@@ -64,7 +62,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
 
   return (
     <>
-      <div className="container mx-auto max-w-6xl p-8 flex justify-center md:pt-18">
+      <div className="container mx-auto max-w-7xl p-8 flex justify-center md:pt-18">
 
         <div className="space-y-14 md:w-full">
 
@@ -77,16 +75,16 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
             <img
               src={country.flags.svg}
               alt={country.flags.alt || `The flag from ${country.name.common}`}
-              className="max-w-[320px] h-auto w-auto object-contain md:max-w-[500px]"
+              className="w-[320px] h-auto object-contain md:w-[580px] md:max-h-[400px]"
             />
 
-            <div className="w-[320] space-y-10 md:w-[500]">
+            <div className="w-[320] space-y-10 md:w-[540]">
               <div>
                 <h1 className="text-3xl font-bold">{country.name.common}</h1>
               </div>
 
-              <div className="space-y-10 md:flex md:justify-between md:mb-0">
-                <div className="space-y-3 max-w-[240]">
+              <div className="space-y-10 md:flex md:justify-between md:mb-0 md:gap-10">
+                <div className="space-y-3 ">
                   <p><span className="font-semibold">Native Name: </span>{Object.values(country.name.nativeName)[0].official}</p>
                   <p><span className="font-semibold">Population: </span>{country.population.toLocaleString('en-US')}</p>
                   <p><span className="font-semibold">Region: </span>{country.region}</p>
@@ -94,8 +92,8 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                   <p><span className="font-semibold">Capital: </span>{country.capital}</p>
                 </div>
 
-                <div className="space-y-3 max-w-[240]">
-                  <p><span className="font-semibold">Top Level Domain:</span>{country.tld[0]}</p>
+                <div className="space-y-3 ">
+                  <p><span className="font-semibold">Top Level Domain: </span>{country.tld[0]}</p>
                   <p><span className="font-semibold">Currencies: </span>{Object.values(country.currencies).map(c => c.name).join(', ')}</p>
                   <p><span className="font-semibold">Languages: </span>{Object.values(country.languages).map(l => l).join(', ')}</p>
                 </div>

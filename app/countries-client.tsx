@@ -72,11 +72,13 @@ export default function CountriesClient({ countries }: { countries: Countries })
             filtered.map((country) => (
               <Link href={`/country/${country.cca3}`} key={country.cca3} className="hover:scale-101 hover:shadow-xl/20 duration-300">
                 <Card className={`justify-between border-none rounded-none py-8 pt-0 w-[274] h-[380] md:h-[370]`}>
-                  <img
-                    src={country.flags.svg}
-                    alt={country.flags.alt || `The flag from ${country.name.common}`}
-                    className="max-h-[180px] h-auto w-auto object-contain"
-                  />
+                  <div className="w-full h-[180px]">
+                    <img
+                      src={country.flags.svg}
+                      alt={country.flags.alt || `The flag from ${country.name.common}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <CardContent className="space-y-5">
                     <CardTitle className="text-2xl font-bold md:text-xl">
                       {country.name.common}
