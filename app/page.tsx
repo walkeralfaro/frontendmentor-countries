@@ -19,13 +19,15 @@ export default async function App() {
     const parsed = CountriesSchema.safeParse(response)
 
     if (!parsed.success) {
-      console.error("REST API error:", parsed.error)
-      return notFound()
+      throw new Error( 'REST API error:', parsed.error)
+      // console.error("REST API error:", parsed.error)
+      // return notFound()
     }
 
     return <CountriesClient countries={parsed.data} />
+    
   } catch (error) {
-    console.error("REST API error:", error)
+    console.error("PROBLEMS!:", error)
     return notFound()
   }
 }

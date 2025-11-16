@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// Countries from main page
 export const CountryResumeSchema = z.object({
   flags: z.object({
     svg: z.url(),
@@ -19,7 +20,7 @@ export const CountriesSchema = z.array(CountryResumeSchema)
 export type CountryResume = z.infer<typeof CountryResumeSchema>
 export type Countries = z.infer<typeof CountriesSchema>
 
-
+// Country card
 export const CountrySchema = z.object({
   flags: z.object({
     svg: z.url(),
@@ -27,6 +28,13 @@ export const CountrySchema = z.object({
   }),
   name: z.object({
     common: z.string(),
+    nativeName: z.record(
+      z.string(),
+      z.object({
+        official: z.string(),
+        common: z.string()
+      })
+    )
   }),
   tld: z.array(z.string()),
   currencies: z.record(
@@ -47,3 +55,15 @@ export const CountrySchema = z.object({
 });
 
 export type Country = z.infer<typeof CountrySchema>
+
+
+// Border Countries
+export const BorderCountrySchema = z.object({
+  name: z.string(),
+  code: z.string(),
+});
+
+export const BorderCountriesSchema = z.array(BorderCountrySchema);
+
+export type BorderCountry = z.infer<typeof BorderCountrySchema>;
+export type BorderCountries = z.infer<typeof BorderCountriesSchema>;

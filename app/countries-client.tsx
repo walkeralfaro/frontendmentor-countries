@@ -37,10 +37,9 @@ export default function CountriesClient({ countries }: { countries: Countries })
       {/* Filters */}
       <div className="container mx-auto max-w-7xl p-6 flex flex-col gap-10">
 
-        <InputGroup className="h-12 rounded border-none">
+        <InputGroup className="h-12 rounded border-none bg-white">
           <InputGroupInput
             placeholder="Search for a country..."
-            className="h-20"
             onChange={e => setSearch(e.target.value)}
           />
           <InputGroupAddon className="px-5 h-20"><Search /></InputGroupAddon>
@@ -50,7 +49,7 @@ export default function CountriesClient({ countries }: { countries: Countries })
           value={region}
           onValueChange={(value) => setRegion(value)}
         >
-          <SelectTrigger className="border-none rounded min-h-12 w-[200px]">
+          <SelectTrigger className="border-none rounded min-h-12 w-[200px] bg-white">
             <SelectValue placeholder="Filter by Region" />
           </SelectTrigger>
 
@@ -71,7 +70,6 @@ export default function CountriesClient({ countries }: { countries: Countries })
 
       {/* Cards */}
       <div className="container mx-auto max-w-7xl p-6">
-        {/* <div className="flex flex-col items-center md:justify-between md:flex-row md:flex-wrap gap-10"> */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 place-items-center">
           {
             filtered.map((country) => (
@@ -83,15 +81,15 @@ export default function CountriesClient({ countries }: { countries: Countries })
                     className="max-h-[180px] h-auto w-auto object-contain"
                   />
                   <CardContent className="space-y-5">
-                    <CardTitle>
+                    <CardTitle className="text-2xl font-bold">
                       {country.name.common}
                     </CardTitle>
 
-                    <CardDescription>
-                      <p><span className="font-bold">Population: </span>{country.population}</p>
-                      <p><span className="font-bold">Region: </span>{country.region}</p>
-                      <p><span className="font-bold">Capital: </span>{country.capital}</p>
-                    </CardDescription>
+                    <div>
+                      <p><span className="font-semibold">Population: </span>{country.population.toLocaleString('en-US')}</p>
+                      <p><span className="font-semibold">Region: </span>{country.region}</p>
+                      <p><span className="font-semibold">Capital: </span>{country.capital}</p>
+                    </div>
                   </CardContent>
                 </Card>
               </Link>
