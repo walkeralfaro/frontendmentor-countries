@@ -6,64 +6,56 @@ import { notFound } from "next/navigation"
 export const getCountryDetails = async (code: string) => {
   'use cache'
 
-  try {
-    // 1) Primera petición — detalles del país
-    const res = await fetch(
-      `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`,
-      { cache: "force-cache" } // SSG total
-    )
+  // 1) Validación de parámetro
+  if (!code || typeof code !== "string") notFound()
 
-    if (!res.ok) return notFound()
+  code = code.trim().toUpperCase()
 
-    const data = await res.json()
+  // 2) Petición principal
+  const response = await fetch(
+    `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`,
+    { cache: "force-cache" }
+  )
 
-    const parsedCountry = CountrySchema.safeParse(data)
-    if (!parsedCountry.success) {
-      console.error(parsedCountry.error)
-      return notFound()
-    }
+  if (!response.ok) notFound()
 
-    const country = parsedCountry.data
-    const borders = country.borders ?? []
+  const data = await response.json()
+  const parsedCountry = CountrySchema.safeParse(data)
+  if (!parsedCountry.success) notFound()
 
-    // 2) Si no tiene fronteras → devolver solo country
-    if (borders.length === 0) {
-      return { country, borderCountries: [] }
-    }
+  const country = parsedCountry.data
+  const borders = country.borders ?? []
 
-    // 3) Obtener países fronterizos
-    const codes = borders.join(",")
-    const bordersRes = await fetch(
-      `https://restcountries.com/v3.1/alpha?codes=${codes}&fields=name,cca3`,
-      { cache: "force-cache" }
-    )
+  // 3) No tiene fronteras
+  if (borders.length === 0) {
+    return { country, borderCountries: [] }
+  }
 
-    if (!bordersRes.ok) return notFound()
+  // 4) Petición países fronterizos
+  const codes = borders.join(",")
 
-    const bordersData = await bordersRes.json()
+  const bordersRes = await fetch(
+    `https://restcountries.com/v3.1/alpha?codes=${codes}&fields=name,cca3`,
+    { cache: "force-cache" }
+  )
 
-    // 4) Transformar y validar
-    const formatted = bordersData.map((c: any) => ({
-      name: c.name.common,
-      code: c.cca3,
-    }))
+  if (!bordersRes.ok) notFound()
 
-    const parsedBorders = BorderCountriesSchema.safeParse(formatted)
-    if (!parsedBorders.success) {
-      console.error(parsedBorders.error)
-      return notFound()
-    }
+  const bordersData = await bordersRes.json()
 
-    return {
-      country,
-      borderCountries: parsedBorders.data,
-    }
-  } catch (error) {
-    console.error(error)
-    return notFound()
+  const formatted = bordersData.map((c: any) => ({
+    name: c.name.common,
+    code: c.cca3,
+  }))
+
+  const parsedBorders = BorderCountriesSchema.safeParse(formatted)
+  if (!parsedBorders.success) notFound()
+
+  return {
+    country,
+    borderCountries: parsedBorders.data,
   }
 }
-
 
 export default async function CountryPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params
@@ -76,12 +68,10 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
 
         <div className="space-y-14 md:w-full">
 
-          <div className="w-full flex">
-            <Link href="/" className="flex justify-between px-5 py-2 bg-card shadow-xl/20 items-center gap-2 w-[100] ">
-              <ArrowLeftIcon className="w-4 h-4" />
-              Back
-            </Link>
-          </div>
+          <Link href="/" className="flex justify-between px-5 py-2 bg-card shadow-xl/20 items-center gap-2 w-[100] ">
+            <ArrowLeftIcon className="w-4 h-4" />
+            Back
+          </Link>
 
           <div className="space-y-14 md:flex justify-between items-start">
             <img
@@ -90,7 +80,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
               className="max-w-[320px] h-auto w-auto object-contain md:max-w-[500px]"
             />
 
-            <div className="space-y-10 md:w-[480]">
+            <div className="max-w-[320] space-y-10 md:w-[480]">
               <div>
                 <h1 className="text-3xl font-bold">{country.name.common}</h1>
               </div>
@@ -135,11 +125,6 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
           </div>
         </div>
       </div>
-
-
-
-
-
 
     </>
   )

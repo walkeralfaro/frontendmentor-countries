@@ -13,7 +13,7 @@ export function ThemeToggle() {
       variant="ghost"
       className="cursor-pointer"
     >
-      <Moon fill="currentColor" /> Dark Mode
+      <Moon /> Dark Mode
     </Button>
   )
 }
