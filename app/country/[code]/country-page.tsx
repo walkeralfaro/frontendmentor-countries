@@ -86,7 +86,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
               </div>
 
               <div className="space-y-10 md:flex md:justify-between md:mb-0">
-                <div className="space-y-3 max-w-[250]">
+                <div className="space-y-3 max-w-[240]">
                   <p><span className="font-semibold">Native Name: </span>{Object.values(country.name.nativeName)[0].official}</p>
                   <p><span className="font-semibold">Population: </span>{country.population.toLocaleString('en-US')}</p>
                   <p><span className="font-semibold">Region: </span>{country.region}</p>
@@ -94,7 +94,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                   <p><span className="font-semibold">Capital: </span>{country.capital}</p>
                 </div>
 
-                <div className="space-y-3 max-w-[250]">
+                <div className="space-y-3 max-w-[240]">
                   <p><span className="font-semibold">Top Level Domain:</span>{country.tld[0]}</p>
                   <p><span className="font-semibold">Currencies: </span>{Object.values(country.currencies).map(c => c.name).join(', ')}</p>
                   <p><span className="font-semibold">Languages: </span>{Object.values(country.languages).map(l => l).join(', ')}</p>
