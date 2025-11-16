@@ -6,52 +6,62 @@ import { notFound } from "next/navigation"
 export const getCountryDetails = async (code: string) => {
   'use cache'
 
-  // 1) Validación de parámetro
-  if (!code || typeof code !== "string") notFound()
+  if (!code) notFound()
 
   code = code.trim().toUpperCase()
 
-  // 2) Petición principal
-  const response = await fetch(
-    `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`
+  // -------------------------------
+  // 1) Fetch país principal
+  // -------------------------------
+  const res = await fetch(
+    `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`,
+    { cache: "force-cache" }
   )
 
-  if (!response.ok) notFound()
+  if (!res.ok) notFound()
 
-  const data = await response.json()
-  const parsedCountry = CountrySchema.safeParse(data)
+  const json = await res.json()
+  const parsedCountry = CountrySchema.safeParse(json)
   if (!parsedCountry.success) notFound()
 
   const country = parsedCountry.data
   const borders = country.borders ?? []
 
-  // 3) No tiene fronteras
+  // -------------------------------
+  // 2) País sin fronteras
+  // -------------------------------
   if (borders.length === 0) {
     return { country, borderCountries: [] }
   }
 
-  // 4) Petición países fronterizos
-  const codes = borders.join(",")
+  // -------------------------------
+  // 3) Fetch fronterizos
+  // -------------------------------
+  const bordersKey = borders.join(",")
 
   const bordersRes = await fetch(
-    `https://restcountries.com/v3.1/alpha?codes=${codes}&fields=name,cca3`
+    `https://restcountries.com/v3.1/alpha?codes=${bordersKey}&fields=name,cca3`,
+    { cache: "force-cache" }
   )
 
   if (!bordersRes.ok) notFound()
 
-  const bordersData = await bordersRes.json()
+  const bordersJson = await bordersRes.json()
 
-  const formatted = bordersData.map((c: any) => ({
+  const formatted = bordersJson.map((c: any) => ({
     name: c.name.common,
-    code: c.cca3,
+    code: c.cca3
   }))
 
   const parsedBorders = BorderCountriesSchema.safeParse(formatted)
   if (!parsedBorders.success) notFound()
 
+  // -------------------------------
+  // 4) Resultado final
+  // -------------------------------
   return {
     country,
-    borderCountries: parsedBorders.data,
+    borderCountries: parsedBorders.data
   }
 }
 
@@ -110,7 +120,6 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                     <Link
                       href={`/country/${border}`}
                       key={border}
-                      prefetch={false}
                       className="bg-card px-5 py-1 shadow-xl/20"
                     >
                       {borderMap[border] ?? border}
