@@ -1,33 +1,40 @@
-// app/page.tsx
 import { CountriesSchema } from "@/schemas"
 import CountriesClient from "./countries-client"
-import axios from "axios"
 import { notFound } from "next/navigation"
 
-// TEMPORAL
-import { countriesData } from "@/countries"
-
 export default async function App() {
-  'use cache'
+  "use cache"
 
   try {
-    // const response = await axios.get("https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,tld,currencies,languages,borders,cca3")
-    const response = countriesData
 
-    // Validar con Zod
-    // const parsed = CountriesSchema.safeParse(response.data)
-    const parsed = CountriesSchema.safeParse(response)
+    // 1) Petición con tipado generico y timeout
+    const response = await fetch(
+      "https://restcountries.com/v3.1/all?fields=name,flags,population,region,capital,tld,currencies,languages,borders,cca3",
+      {
+        // cache estática por defecto ("force-cache" en producción)
+        // next: { revalidate: false } — implícito
+      }
+    )
 
-    if (!parsed.success) {
-      throw new Error( 'REST API error:', parsed.error)
-      // console.error("REST API error:", parsed.error)
-      // return notFound()
+    if (!response.ok) {
+      throw new Error("REST Countries API failed")
     }
 
+    const json = await response.json()
+
+    // 2) Validar con Zod
+    const parsed = CountriesSchema.safeParse(json)
+
+    if (!parsed.success) {
+      console.error(parsed.error)
+      throw new Error("Invalid REST API data")
+    }
+
+    // 3) Devolver el componente cliente con datos validados
     return <CountriesClient countries={parsed.data} />
-    
+
   } catch (error) {
-    console.error("PROBLEMS!:", error)
+    console.error("API ERROR:", error)
     return notFound()
   }
 }

@@ -74,7 +74,7 @@ export default function CountriesClient({ countries }: { countries: Countries })
           {
             filtered.map((country) => (
               <Link href={`/country/${country.cca3}`} key={country.cca3}>
-                <Card className={`justify-between border-none rounded-none py-8 pt-0 w-[260] h-[340]`}>
+                <Card className={`justify-between border-none rounded-none py-8 pt-0 w-[270] h-[380]`}>
                   <img
                     src={country.flags.svg}
                     alt={country.flags.alt || `The flag from ${country.name.common}`}

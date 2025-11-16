@@ -6,6 +6,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 export const getCountryDetails = async (code: string) => {
+  'use cache'
   try {
     // 1) Primera petición (detalles del país)
     const response = await axios.get(
@@ -62,60 +63,67 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
 
   return (
     <>
-      {/* <Button><ArrowLeftIcon /> Back </Button> */}
+      <div className="container mx-auto max-w-6xl p-8 flex justify-center md:pt-18">
 
-      <div className="container mx-auto max-w-7xl p-8 flex flex-col items-center space-y-14">
+        <div className="space-y-14 md:w-full">
 
-        <div className="w-full flex ">
-          <Link href="/" className="flex justify-between px-5 py-2 bg-card shadow-xl/20 items-center gap-2 w-[100] ">
-            <ArrowLeftIcon className="w-4 h-4" />
-            Back
-          </Link>
-        </div>
-
-        <img
-          src={country.flags.svg}
-          alt={country.flags.alt || `The flag from ${country.name.common}`}
-          className="max-w-[320px] h-auto w-auto object-contain"
-        />
-
-        <div className="space-y-10">
-          <div>
-            <h1 className="text-3xl font-bold">{country.name.common}</h1>
+          <div className="w-full flex">
+            <Link href="/" className="flex justify-between px-5 py-2 bg-card shadow-xl/20 items-center gap-2 w-[100] ">
+              <ArrowLeftIcon className="w-4 h-4" />
+              Back
+            </Link>
           </div>
 
-          <div className="space-y-3">
-            <p><span className="font-semibold">Native Name: </span>{Object.values(country.name.nativeName)[0].official}</p>
-            <p><span className="font-semibold">Population: </span>{country.population.toLocaleString('en-US')}</p>
-            <p><span className="font-semibold">Region: </span>{country.region}</p>
-            <p><span className="font-semibold">Region: </span>{country.subregion}</p>
-            <p><span className="font-semibold">Capital: </span>{country.capital}</p>
-          </div>
+          <div className="space-y-14 md:flex justify-between items-start">
+            <img
+              src={country.flags.svg}
+              alt={country.flags.alt || `The flag from ${country.name.common}`}
+              className="max-w-[320px] h-auto w-auto object-contain md:max-w-[500px]"
+            />
 
-          <div className="space-y-3">
-            <p><span className="font-semibold">Top Level Domain:</span>{country.tld[0]}</p>
-            <p><span className="font-semibold">Currencies: </span>{Object.values(country.currencies).map(c => c.name).join(', ')}</p>
-            <p><span className="font-semibold">Languages: </span>{Object.values(country.languages).map(l => l).join(', ')}</p>
-          </div>
+            <div className="space-y-10 md:w-[480]">
+              <div>
+                <h1 className="text-3xl font-bold">{country.name.common}</h1>
+              </div>
 
-          <div>
-            <h2 className="text-xl font-semibold mb-5">Border Countries:</h2>
+              <div className="space-y-10 md:flex md:justify-between md:mb-0">
+                <div className="space-y-3 max-w-[250]">
+                  <p><span className="font-semibold">Native Name: </span>{Object.values(country.name.nativeName)[0].official}</p>
+                  <p><span className="font-semibold">Population: </span>{country.population.toLocaleString('en-US')}</p>
+                  <p><span className="font-semibold">Region: </span>{country.region}</p>
+                  <p><span className="font-semibold">Region: </span>{country.subregion}</p>
+                  <p><span className="font-semibold">Capital: </span>{country.capital}</p>
+                </div>
 
-            <div className="flex flex-wrap gap-3">
+                <div className="space-y-3 max-w-[250]">
+                  <p><span className="font-semibold">Top Level Domain:</span>{country.tld[0]}</p>
+                  <p><span className="font-semibold">Currencies: </span>{Object.values(country.currencies).map(c => c.name).join(', ')}</p>
+                  <p><span className="font-semibold">Languages: </span>{Object.values(country.languages).map(l => l).join(', ')}</p>
+                </div>
 
-              {country.borders?.map(border => (
-                <Link
-                  href={`/country/${border}`}
-                  key={border}
-                  className="bg-card px-5 py-1 shadow-xl/20"
-                >
-                  {borderMap[border] ?? border}
-                </Link>
-              ))}
+              </div>
 
+
+              <div className="md:w-full">
+                <h2 className="text-xl font-semibold mb-5 md:text-base">Border Countries:</h2>
+
+                <div className="flex flex-wrap gap-3">
+
+                  {country.borders?.map(border => (
+                    <Link
+                      href={`/country/${border}`}
+                      key={border}
+                      className="bg-card px-5 py-1 shadow-xl/20"
+                    >
+                      {borderMap[border] ?? border}
+                    </Link>
+                  ))}
+
+                </div>
+              </div>
             </div>
-          </div>
 
+          </div>
         </div>
       </div>
 
