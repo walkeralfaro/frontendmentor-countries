@@ -80,7 +80,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
               className="max-w-[320px] h-auto w-auto object-contain md:max-w-[500px]"
             />
 
-            <div className="max-w-[320] space-y-10 md:w-[480]">
+            <div className="w-[320] space-y-10 md:w-[500]">
               <div>
                 <h1 className="text-3xl font-bold">{country.name.common}</h1>
               </div>
