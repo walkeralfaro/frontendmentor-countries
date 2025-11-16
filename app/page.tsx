@@ -3,7 +3,7 @@ import CountriesClient from "./countries-client"
 import { notFound } from "next/navigation"
 
 export default async function App() {
-  "use cache"
+  'use cache'
 
   try {
 

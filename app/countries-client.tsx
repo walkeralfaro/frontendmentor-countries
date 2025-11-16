@@ -36,7 +36,6 @@ export default function CountriesClient({ countries }: { countries: Countries })
     <>
       {/* Filters */}
       <div className="container mx-auto max-w-7xl p-6 flex flex-col gap-10 md:flex-row md:justify-between md:mt-12">
-
         <InputGroup className="h-12 rounded border-none bg-white md:w-[460]">
           <InputGroupInput
             placeholder="Search for a country..."
@@ -64,8 +63,6 @@ export default function CountriesClient({ countries }: { countries: Countries })
             </SelectGroup>
           </SelectContent>
         </Select>
-
-
       </div>
 
       {/* Cards */}
@@ -73,7 +70,7 @@ export default function CountriesClient({ countries }: { countries: Countries })
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 place-items-center">
           {
             filtered.map((country) => (
-              <Link href={`/country/${country.cca3}`} key={country.cca3}>
+              <Link href={`/country/${country.cca3}`} key={country.cca3} className="hover:scale-101 hover:shadow-xl/20 duration-300">
                 <Card className={`justify-between border-none rounded-none py-8 pt-0 w-[274] h-[380] md:h-[370]`}>
                   <img
                     src={country.flags.svg}

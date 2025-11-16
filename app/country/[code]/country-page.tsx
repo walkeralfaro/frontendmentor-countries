@@ -1,19 +1,23 @@
-import { Button } from "@/components/ui/button"
 import { BorderCountriesSchema, CountrySchema } from "@/schemas"
-import axios from "axios"
 import { ArrowLeftIcon } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
 export const getCountryDetails = async (code: string) => {
   'use cache'
+
   try {
-    // 1) Primera petición (detalles del país)
-    const response = await axios.get(
-      `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`
+    // 1) Primera petición — detalles del país
+    const res = await fetch(
+      `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`,
+      { cache: "force-cache" } // SSG total
     )
 
-    const parsedCountry = CountrySchema.safeParse(response.data)
+    if (!res.ok) return notFound()
+
+    const data = await res.json()
+
+    const parsedCountry = CountrySchema.safeParse(data)
     if (!parsedCountry.success) {
       console.error(parsedCountry.error)
       return notFound()
@@ -27,16 +31,21 @@ export const getCountryDetails = async (code: string) => {
       return { country, borderCountries: [] }
     }
 
-    // 3) Petición de países fronterizos
+    // 3) Obtener países fronterizos
     const codes = borders.join(",")
-    const bordersUrl = `https://restcountries.com/v3.1/alpha?codes=${codes}&fields=name,cca3`
+    const bordersRes = await fetch(
+      `https://restcountries.com/v3.1/alpha?codes=${codes}&fields=name,cca3`,
+      { cache: "force-cache" }
+    )
 
-    const bordersRes = await axios.get(bordersUrl)
+    if (!bordersRes.ok) return notFound()
+
+    const bordersData = await bordersRes.json()
 
     // 4) Transformar y validar
-    const formatted = bordersRes.data.map((c: any) => ({
+    const formatted = bordersData.map((c: any) => ({
       name: c.name.common,
-      code: c.cca3
+      code: c.cca3,
     }))
 
     const parsedBorders = BorderCountriesSchema.safeParse(formatted)
@@ -47,14 +56,14 @@ export const getCountryDetails = async (code: string) => {
 
     return {
       country,
-      borderCountries: parsedBorders.data
+      borderCountries: parsedBorders.data,
     }
-
   } catch (error) {
     console.error(error)
     return notFound()
   }
 }
+
 
 export default async function CountryPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params
