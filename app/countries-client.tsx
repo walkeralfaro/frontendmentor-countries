@@ -35,9 +35,9 @@ export default function CountriesClient({ countries }: { countries: Countries })
   return (
     <>
       {/* Filters */}
-      <div className="container mx-auto max-w-7xl p-6 flex flex-col gap-10">
+      <div className="container mx-auto max-w-7xl p-6 flex flex-col gap-10 md:flex-row md:justify-between md:mt-12">
 
-        <InputGroup className="h-12 rounded border-none bg-white">
+        <InputGroup className="h-12 rounded border-none bg-white md:w-[460]">
           <InputGroupInput
             placeholder="Search for a country..."
             onChange={e => setSearch(e.target.value)}
@@ -74,14 +74,14 @@ export default function CountriesClient({ countries }: { countries: Countries })
           {
             filtered.map((country) => (
               <Link href={`/country/${country.cca3}`} key={country.cca3}>
-                <Card className={`justify-between border-none rounded-none py-8 pt-0 w-[270] h-[380]`}>
+                <Card className={`justify-between border-none rounded-none py-8 pt-0 w-[274] h-[380] md:h-[370]`}>
                   <img
                     src={country.flags.svg}
                     alt={country.flags.alt || `The flag from ${country.name.common}`}
                     className="max-h-[180px] h-auto w-auto object-contain"
                   />
                   <CardContent className="space-y-5">
-                    <CardTitle className="text-2xl font-bold">
+                    <CardTitle className="text-2xl font-bold md:text-xl">
                       {country.name.common}
                     </CardTitle>
 
