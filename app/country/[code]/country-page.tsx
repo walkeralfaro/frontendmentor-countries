@@ -1,67 +1,100 @@
 import { BorderCountriesSchema, CountrySchema } from "@/schemas"
+import countriesData from "@/data.json"
 import { ArrowLeftIcon } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+
+// Índice por código alpha-3 para buscar sin recorrer el array completo
+const countriesByCode = new Map(
+  countriesData.map((country) => [country.alpha3Code.toUpperCase(), country])
+)
+
+// Convierte el shape v2 de data.json al modelo v3.1 que consume la UI
+const normalizeCountry = (raw: (typeof countriesData)[number]) => {
+  const nativeKey =
+    raw.languages[0]?.iso639_1 ??
+    raw.languages[0]?.iso639_2 ??
+    "native"
+
+  return {
+    flags: {
+      svg: raw.flags.svg,
+      alt: `The flag of ${raw.name}`,
+    },
+    name: {
+      common: raw.name,
+      nativeName: {
+        [nativeKey]: {
+          official: raw.nativeName,
+          common: raw.nativeName,
+        },
+      },
+    },
+    tld: raw.topLevelDomain,
+    currencies: Object.fromEntries(
+      (raw.currencies ?? []).map((currency) => [
+        currency.code,
+        { name: currency.name, symbol: currency.symbol },
+      ])
+    ),
+    capital: raw.capital ? [raw.capital] : undefined,
+    region: raw.region,
+    subregion: raw.subregion,
+    languages: Object.fromEntries(
+      raw.languages.map((language) => [
+        language.iso639_1 ?? language.iso639_2 ?? language.name,
+        language.name,
+      ])
+    ),
+    borders: raw.borders,
+    population: raw.population,
+  }
+}
 
 export const getCountryDetails = async (code: string) => {
   'use cache'
 
   if (!code) notFound()
 
-  code = code.trim().toUpperCase()
+  const normalizedCode = code.trim().toUpperCase()
 
   // -------------------------------
-  // 1) Fetch país principal
+  // 1) País principal desde data.json
   // -------------------------------
-  const res = await fetch(
-    `https://restcountries.com/v3.1/alpha/${code}?fields=name,flags,population,region,subregion,capital,tld,currencies,languages,borders`,
-    { cache: "force-cache" }
-  )
+  const rawCountry = countriesByCode.get(normalizedCode)
 
-  if (!res.ok) notFound()
+  if (!rawCountry) notFound()
 
-  const json = await res.json()
-  const parsedCountry = CountrySchema.safeParse(json)
-  if (!parsedCountry.success) notFound()
+  const parsedCountry = CountrySchema.safeParse(normalizeCountry(rawCountry))
+
+  if (!parsedCountry.success) {
+    console.error(parsedCountry.error)
+    notFound()
+  }
 
   const country = parsedCountry.data
-  const borders = country.borders ?? []
 
   // -------------------------------
-  // 2) País sin fronteras
+  // 2) Fronterizos desde data.json
   // -------------------------------
-  if (borders.length === 0) {
-    return { country, borderCountries: [] }
+  const formattedBorders = (country.borders ?? []).map((border) => ({
+    code: border,
+    name: countriesByCode.get(border.toUpperCase())?.name ?? border,
+  }))
+
+  const parsedBorders = BorderCountriesSchema.safeParse(formattedBorders)
+
+  if (!parsedBorders.success) {
+    console.error(parsedBorders.error)
+    notFound()
   }
 
   // -------------------------------
-  // 3) Fetch fronterizos
-  // -------------------------------
-  const bordersKey = borders.join(",")
-
-  const bordersRes = await fetch(
-    `https://restcountries.com/v3.1/alpha?codes=${bordersKey}&fields=name,cca3`,
-    { cache: "force-cache" }
-  )
-
-  if (!bordersRes.ok) notFound()
-
-  const bordersJson = await bordersRes.json()
-
-  const formatted = bordersJson.map((c: any) => ({
-    name: c.name.common,
-    code: c.cca3
-  }))
-
-  const parsedBorders = BorderCountriesSchema.safeParse(formatted)
-  if (!parsedBorders.success) notFound()
-
-  // -------------------------------
-  // 4) Resultado final
+  // 3) Resultado final
   // -------------------------------
   return {
     country,
-    borderCountries: parsedBorders.data
+    borderCountries: parsedBorders.data,
   }
 }
 
@@ -99,7 +132,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                   <p><span className="font-semibold">Population: </span>{country.population.toLocaleString('en-US')}</p>
                   <p><span className="font-semibold">Region: </span>{country.region}</p>
                   <p><span className="font-semibold">Region: </span>{country.subregion}</p>
-                  <p><span className="font-semibold">Capital: </span>{country.capital}</p>
+                  <p><span className="font-semibold">Capital: </span>{country.capital?.join(", ")}</p>
                 </div>
 
                 <div className="space-y-3 ">
